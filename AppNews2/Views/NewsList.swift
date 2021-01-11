@@ -15,61 +15,63 @@ struct NewsList: View {
     var body: some View {
         ZStack(alignment: Alignment(horizontal: .trailing, vertical: .top)) {
             
-            ScrollView {
-                Spacer().frame(height: 70)
-
-                LoadingView(isLoading: self.newsState.isLoading, error: self.newsState.error) {
-                    self.newsState.loadNews(witch: .topHeadlines)
-                }.padding(.all)
-                
-                if newsState.news != nil {
-                    ForEach(self.newsState.news!, id: \.title) { news in
-                        
-                        Button {
-                            newsLink = news
-                        } label: {
-                            NewRow(article: news)
-                                .padding(.horizontal)
+            if !showSearch {
+                ScrollView {
+                    Spacer().frame(height: 70)
+                    
+                    LoadingView(isLoading: self.newsState.isLoading, error: self.newsState.error) {
+                        self.newsState.loadNews(witch: .topHeadlines)
+                    }.padding(.all)
+                    
+                    if newsState.news != nil {
+                        ForEach(self.newsState.news!, id: \.title) { news in
+                            
+                            Button {
+                                newsLink = news
+                            } label: {
+                                NewRow(article: news)
+                                    .padding(.horizontal)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
                         }
-                        .buttonStyle(PlainButtonStyle())
+                        .fullScreenCover(item: self.$newsLink) { link in
+                            SafariView(url: link.url!).ignoresSafeArea()
+                        }
+                    }
+                    
+                    HStack {
+                        Button(action: {
+                            self.newsState.pageUpOrDown = false
+                            self.newsState.page -= 1
+                            self.newsState.loadNews(witch: .topHeadlines)
+                        }) {
+                            Text("Anterior")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .opacity(self.newsState.page > 1 ? 1 : 0)
+                        }
                         
+                        Spacer()
+                        
+                        Button(action: {
+                            self.newsState.pageUpOrDown = true
+                            self.newsState.page += 1
+                            self.newsState.loadNews(witch: .topHeadlines)
+                        }) {
+                            Text("Próximo")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .opacity(self.newsState.isTotalPages ? 1 : 0)
+                        }
                     }
-                    .fullScreenCover(item: self.$newsLink) { link in
-                        SafariView(url: link.url!).ignoresSafeArea()
-                    }
-                }
-                
-                HStack {
-                    Button(action: {
-                        self.newsState.pageUpOrDown = false
-                        self.newsState.page -= 1
-                        self.newsState.loadNews(witch: .topHeadlines)
-                    }) {
-                        Text("Anterior")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .opacity(self.newsState.page > 1 ? 1 : 0)
-                    }
+                    .padding(.vertical, 20)
+                    .padding(.horizontal, 35)
+                    .opacity(self.newsState.isNewsCount ? 1 : 0)
                     
-                    Spacer()
-                    
-                    Button(action: {
-                        self.newsState.pageUpOrDown = true
-                        self.newsState.page += 1
-                        self.newsState.loadNews(witch: .topHeadlines)
-                    }) {
-                        Text("Próximo")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .opacity(self.newsState.isTotalPages ? 1 : 0)
-                    }
                 }
-                .padding(.vertical, 20)
-                .padding(.horizontal, 35)
-                .opacity(self.newsState.isNewsCount ? 1 : 0)
-                
             }
-
+            
             GeometryReader { geo in
                 
                 VStack {

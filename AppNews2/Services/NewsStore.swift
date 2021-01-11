@@ -10,12 +10,12 @@ import Foundation
 class NewsStore: NewsService {
     
     static let shared = NewsStore()
-    private init() {}
     
-    private let apiKeyKav = "8468d3e24f614f959062cd9645b04e9d"
     private let apiKey = "ef11fe53da4647279b7cd9f2b72bf003"
     private let baseApiURL = "https://newsapi.org/v2"
     private let urlSession = URLSession.shared
+    
+    private init() {}
     
     func fetchNewsSearch(query: String, endPoint: NewsEndPoint, page: String, completion: @escaping (Result<News, MovieError>) -> ()) {
         guard let url = URL(string: "\(baseApiURL)/\(endPoint.rawValue)") else {
